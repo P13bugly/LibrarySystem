@@ -39,8 +39,8 @@ UPDATE Customer SET customer_password = '123' WHERE customer_user = 'chenbowen';
 -- 4. 自然类书籍表 (NatureBook)
 -- 注意：已包含后续 ALTER TABLE 添加的 current, dateon, dateoff 字段 [cite: 215, 216]
 -- ----------------------------
-DROP TABLE IF EXISTS NatureBook;
-CREATE TABLE NatureBook (
+DROP TABLE IF EXISTS Nature;
+CREATE TABLE Nature (
   number VARCHAR(255) PRIMARY KEY COMMENT '书籍编号',
   classnumber VARCHAR(255) COMMENT '类别编号',
   name VARCHAR(255) COMMENT '书名',
@@ -54,7 +54,7 @@ CREATE TABLE NatureBook (
 );
 
 -- 插入初始化书籍数据 [cite: 169-173]
-INSERT INTO NatureBook (number, classnumber, name, classname, price, state, total) VALUES
+INSERT INTO Nature (number, classnumber, name, classname, price, state, total) VALUES
 ('N01', '1', 'Nature and Science',  'Nature', '25', 'in', '1'),
 ('N02', '1', 'My Nature Science ',  'Nature', '23', 'in', '1'),
 ('N03', '1', 'Wonderful Nature  ',  'Nature', '21', 'in', '1'),
@@ -66,15 +66,15 @@ INSERT INTO NatureBook (number, classnumber, name, classname, price, state, tota
 ('N09', '1', 'Great Nature      ',  'Nature', '20', 'in', '1'),
 ('N10', '1', 'Buzz Nature       ',  'Nature', '32', 'in', '1');
 -- 文件中提到的 N11 [cite: 212]
-INSERT INTO NatureBook (number, classnumber, name, classname, price, state, total) VALUES
+INSERT INTO Nature (number, classnumber, name, classname, price, state, total) VALUES
 ('N11', '1', 'New World Nature',    'Nature', '18', 'in', '1');
 
 
 -- ----------------------------
 -- 5. 科学类书籍表 (ScienceBook)
 -- ----------------------------
-DROP TABLE IF EXISTS ScienceBook;
-CREATE TABLE ScienceBook (
+DROP TABLE IF EXISTS Science;
+CREATE TABLE Science (
   number VARCHAR(255) PRIMARY KEY,
   classnumber VARCHAR(255),
   name VARCHAR(255),
@@ -87,26 +87,26 @@ CREATE TABLE ScienceBook (
   dateoff VARCHAR(255) DEFAULT NULL
 );
 
--- 初始化 ScienceBook 数据 (示例数据，根据 update 语句推断存在 S01) [cite: 218, 219]
-INSERT INTO ScienceBook (number, classnumber, name, classname, price, state, total) VALUES
+-- 初始化 ScienceBook 数据
+INSERT INTO Science (number, classnumber, name, classname, price, state, total) VALUES
 ('S01', '2', 'Sample Science Book', 'Science', '30', 'in', '1');
 
 -- 执行文件中提到的更新操作 [cite: 218, 219]
-UPDATE ScienceBook SET current = '123' WHERE number = 'S01';
-UPDATE ScienceBook SET dateoff = '20170920' WHERE number = 'S01';
+UPDATE Science SET current = '123' WHERE number = 'S01';
+UPDATE Science SET dateoff = '20170920' WHERE number = 'S01';
 
 
 -- ----------------------------
 -- 6. 个人借阅记录表模板 (user)
--- 注意：Java代码中逻辑是动态创建 '用户名+Customer' 表 (如 wangshaoyongCustomer)
 -- 这里创建基础 user 表作为结构参考 [cite: 219]
 -- ----------------------------
-DROP TABLE IF EXISTS user;
-CREATE TABLE user (
+DROP TABLE IF EXISTS BorrowRecords;
+CREATE TABLE BorrowRecords (
   number VARCHAR(255) PRIMARY KEY COMMENT '书籍编号',
   classname VARCHAR(255) COMMENT '类别名称',
   name VARCHAR(255) COMMENT '书名',
-  dateoff VARCHAR(255) COMMENT '期限'
+  dateoff VARCHAR(255) COMMENT '期限',
+  username VARCHAR(255) COMMENT '借阅人'
 );
 
 

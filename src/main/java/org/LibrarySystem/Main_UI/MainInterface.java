@@ -407,7 +407,6 @@ public class MainInterface extends JFrame implements ActionListener {  //窗口,
                     }else {
                         JOptionPane.showConfirmDialog(null, "欢迎！", "用户注册成功", JOptionPane.OK_CANCEL_OPTION);
                         sqlConn.register_newUser(tf_user.getText(),  tpass);
-                        sqlConn.newCustomer(tf_user.getText());
                     }
                 }else if(rb_manager.isSelected()){
                     //Manager

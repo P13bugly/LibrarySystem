@@ -58,7 +58,7 @@ public class BorrowBook extends JPanel implements ActionListener {
             String className= tf_className.getText();
             Basic_Information.search_className=className;
             //search
-            if(sqlConn.is_Table(className+"book")){
+            if(sqlConn.is_Table(className)){
                 sqlConn.search_className(className);
                 MainInterface.Borrow_to_BorrowInfo();
                 BorrowBook_Output.setTable();

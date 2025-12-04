@@ -1,10 +1,14 @@
 package org.LibrarySystem.User;
 
+import org.LibrarySystem.Book;
+import org.LibrarySystem.DataBase.sqlConn;
 import org.LibrarySystem.Main_UI.MainInterface;
+import org.LibrarySystem.Static.Basic_Information;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -78,8 +82,23 @@ public class PersonalInfo extends JPanel implements ActionListener {
         scrollPane.setBorder(BorderFactory.createEmptyBorder(0, 20, 20, 20));
 
         add(scrollPane, BorderLayout.CENTER);
-    }
 
+        initData();
+    }
+    private void initData(){
+        sqlConn.search_user(Basic_Information.user);
+        tableModel.setRowCount(0);
+
+        for(Book book :Basic_Information.bookArray){
+            Object [] Rowdata ={
+                    book.number,
+                    book.className,
+                    book.name,
+                    book.dateOff
+            };
+            tableModel.addRow(Rowdata);
+        }
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {

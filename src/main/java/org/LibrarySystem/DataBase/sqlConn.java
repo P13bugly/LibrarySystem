@@ -31,7 +31,6 @@ public class sqlConn {
             System.out.println("成功连接到数据库!");
             System.out.println("编号\t姓名\t位置");
             while (rs.next()) {
-                // 修复：原来打印了三次第一列，现在改为打印前三列
                 System.out.print(rs.getString(1) + "\t");
                 System.out.print(rs.getString(2) + "\t");
                 System.out.print(rs.getString(3) + "\t");
@@ -107,7 +106,7 @@ public class sqlConn {
 
     // 通用单值查询 helper
     private static String getSingleValue(String classname, String number, String columnLabel) {
-        String sql = "SELECT * FROM " + classname + "Book WHERE number = ?";
+        String sql = "SELECT * FROM " + classname + " WHERE number = ?";
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, number);
@@ -164,8 +163,7 @@ public class sqlConn {
 
     // 插入新书
     public static void insertBook(String number, String classnumber, String name, String classname, String price, String state, String total) {
-        String tableName = classname + "Book";
-        String sql = "INSERT INTO " + tableName + " VALUES(?, ?, ?, ?, ?, ?, ?, 'null', 'null', 'null')";
+        String sql = "INSERT INTO " + classname + " VALUES(?, ?, ?, ?, ?, ?, ?,? ,? ,? )";
 
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -184,8 +182,7 @@ public class sqlConn {
 
     // 新建图书类别
     public static void newClass(String classnumber, String classname) {
-        String tableName = classname + "Book";
-        String sql = "CREATE TABLE " + tableName + " (number VARCHAR(255) primary key, classnumber VARCHAR(255), " +
+        String sql = "CREATE TABLE " + classname + " (number VARCHAR(255) primary key, classnumber VARCHAR(255), " +
                 "name VARCHAR(255), classname VARCHAR(255), price VARCHAR(255), state VARCHAR(255), " +
                 "total VARCHAR(255), current VARCHAR(255), dateon VARCHAR(255), dateoff VARCHAR(255))";
         try (Connection conn = getConnection();
@@ -198,7 +195,7 @@ public class sqlConn {
 
     // 删除图书信息
     public static void deleteBook(String number, String classname) {
-        String sql = "DELETE FROM " + classname + "Book WHERE number = ?";
+        String sql = "DELETE FROM " + classname + " WHERE number = ?";
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, number);
@@ -211,7 +208,7 @@ public class sqlConn {
     // 查询某类图书信息
     public static void search_className(String classname) {
         Basic_Information.bookArray.clear();
-        String sql = "SELECT * FROM " + classname + "Book";
+        String sql = "SELECT * FROM " + classname;
 
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -238,7 +235,7 @@ public class sqlConn {
 
     // 借书信息变更
     public static void borrowBook_Update(String classname, String number, String user, String dateoff) {
-        String sql = "UPDATE " + classname + "Book SET state = 'out', current = ?, dateoff = ? WHERE number = ?";
+        String sql = "UPDATE " + classname + " SET state = 'out', current = ?, dateoff = ? WHERE number = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -251,22 +248,12 @@ public class sqlConn {
         }
     }
 
-    // 创建用户数据库
-    public static void newCustomer(String user) {
-        String tableName = user + "Customer";
-        String sql = "CREATE TABLE " + tableName + " (number VARCHAR(255) primary key, classname VARCHAR(255), name VARCHAR(255), dateoff VARCHAR(255))";
-        try (Connection conn = getConnection();
-             Statement stmt = conn.createStatement()) {
-            stmt.executeUpdate(sql);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 
-    // 借书插入到用户信息
+
+    // 借书插入到借书记录
     public static void borrowBook_Insert(String classname, String number, String user, String dateoff) {
         String bookName = search_bookName(classname, number);
-        String sql = "INSERT INTO " + user + "Customer VALUES(?, ?, ?, ?)";
+        String sql = "INSERT INTO borrowrecords (number, classname, name, dateoff, username) VALUES(?, ?, ?, ?,?)";
 
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -274,6 +261,7 @@ public class sqlConn {
             pstmt.setString(2, classname);
             pstmt.setString(3, bookName);
             pstmt.setString(4, dateoff);
+            pstmt.setString(5,user);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -282,7 +270,7 @@ public class sqlConn {
 
     // 还书更新图书数据库
     public static void returnBook_BookUpdate(String classname, String number, String user, String dateoff) {
-        String sql = "UPDATE " + classname + "Book SET state = 'in', current = 'null', dateoff = 'null' WHERE number = ?";
+        String sql = "UPDATE " + classname + " SET state = 'in', current = 'null', dateoff = 'null' WHERE number = ?";
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, number);
@@ -292,12 +280,13 @@ public class sqlConn {
         }
     }
 
-    // 还书更新用户数据库
+    // 还书更新借书记录(delete)
     public static void returnBook_UserUpdate(String number, String user) {
-        String sql = "DELETE FROM " + user + "Customer WHERE number = ?";
+        String sql = "DELETE FROM borrowrecords WHERE number = ? AND username = ?";
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, number);
+            pstmt.setString(2,user);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -307,7 +296,7 @@ public class sqlConn {
     // 续借更新两者数据库信息 (使用事务)
     public static void prolongBook_Update(String classname, String number, String dateoff, String user) {
         String sqlBook = "UPDATE " + classname + "Book SET dateoff = ? WHERE number = ?";
-        String sqlUser = "UPDATE " + user + "Customer SET dateoff = ? WHERE number = ?";
+        String sqlUser = "UPDATE borrowrecords SET dateoff = ? WHERE number = ? AND username = ?";
 
         Connection conn = null;
         try {
@@ -322,9 +311,10 @@ public class sqlConn {
                 pst1.setString(2, number);
                 pst1.executeUpdate();
 
-                // 更新用户表
+                // 更新借阅记录
                 pst2.setString(1, dateoff);
                 pst2.setString(2, number);
+                pst2.setString(3,user);
                 pst2.executeUpdate();
             }
 
@@ -353,18 +343,24 @@ public class sqlConn {
     // 查询个人图书信息
     public static void search_user(String user) {
         Basic_Information.bookArray.clear();
-        String sql = "SELECT * FROM " + user + "Customer";
-        try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
 
-            while (rs.next()) {
-                Book book = new Book();
-                book.number = rs.getString(1);
-                book.className = rs.getString(2);
-                book.name = rs.getString(3);
-                book.dateOff = rs.getString(4);
-                Basic_Information.bookArray.add(book);
+        String sql = "SELECT number, classname, name, dateoff FROM BorrowRecords WHERE username = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, user); // 绑定用户名参数
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Book book = new Book();
+                    book.number = rs.getString("number");
+                    book.className = rs.getString("classname");
+                    book.name = rs.getString("name");
+                    book.dateOff = rs.getString("dateoff");
+
+                    Basic_Information.bookArray.add(book);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -375,7 +371,6 @@ public class sqlConn {
     public static boolean is_Table(String table) {
         try (Connection conn = getConnection()) {
             DatabaseMetaData meta = conn.getMetaData();
-            // 注意：MySQL 中表名通常作为 pattern 传入
             try (ResultSet rs = meta.getTables(null, null, table, null)) {
                 return rs.next();
             }
