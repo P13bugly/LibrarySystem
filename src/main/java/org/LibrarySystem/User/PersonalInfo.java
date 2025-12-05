@@ -83,7 +83,22 @@ public class PersonalInfo extends JPanel implements ActionListener {
 
         add(scrollPane, BorderLayout.CENTER);
 
-        initData();
+        this.addAncestorListener(new javax.swing.event.AncestorListener() {
+            @Override
+            public void ancestorAdded(javax.swing.event.AncestorEvent event) {
+                // 当面板变得可见时，重新加载数据
+                System.out.println("面板可见，正在刷新数据... 当前用户: " + Basic_Information.user);
+                initData();
+            }
+
+            @Override
+            public void ancestorRemoved(javax.swing.event.AncestorEvent event) {
+            }
+
+            @Override
+            public void ancestorMoved(javax.swing.event.AncestorEvent event) {
+            }
+        });
     }
     private void initData(){
         sqlConn.search_user(Basic_Information.user);

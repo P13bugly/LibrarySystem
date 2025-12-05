@@ -117,13 +117,6 @@ public class ReturnBook extends JPanel implements ActionListener {
 
             try {
 
-                int deadline = sqlConn.search_bookDateOff(className, number);
-                int returnDate = Integer.parseInt(today);
-
-                if (deadline < returnDate) {
-                    JOptionPane.showMessageDialog(null, "已超期！请前往缴纳罚款。", "逾期提醒", JOptionPane.WARNING_MESSAGE);
-
-                }
 
                 sqlConn.returnBook_BookUpdate(className, number, Basic_Information.user, today);
                 sqlConn.returnBook_UserUpdate(number, Basic_Information.user);

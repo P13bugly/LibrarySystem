@@ -295,7 +295,7 @@ public class sqlConn {
 
     // 续借更新两者数据库信息 (使用事务)
     public static void prolongBook_Update(String classname, String number, String dateoff, String user) {
-        String sqlBook = "UPDATE " + classname + "Book SET dateoff = ? WHERE number = ?";
+        String sqlBook = "UPDATE " + classname + " SET dateoff = ? WHERE number = ?";
         String sqlUser = "UPDATE borrowrecords SET dateoff = ? WHERE number = ? AND username = ?";
 
         Connection conn = null;
@@ -349,7 +349,7 @@ public class sqlConn {
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setString(1, user); // 绑定用户名参数
+            pstmt.setString(1, user);
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
