@@ -23,7 +23,7 @@ public class ReturnBook extends JPanel implements ActionListener {
 
         //top menu
         JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setOpaque(false); // 透明
+        topPanel.setOpaque(false);
         topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         back = new JButton("返回");
@@ -54,11 +54,12 @@ public class ReturnBook extends JPanel implements ActionListener {
         centerPanel.setOpaque(false);
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(15, 10, 15, 10); // 组件之间的间距
+        gbc.insets = new Insets(15, 10, 15, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         //first row
-        JLabel lb_className = new JLabel("书库类别名称：");
+        // 虽然数据库不需要 className 了，但为了保持界面结构，暂时保留输入框，但不参与逻辑
+        JLabel lb_className = new JLabel("书库类别名称(选填)：");
         lb_className.setFont(new Font("微软雅黑", Font.BOLD, 24));
         gbc.gridx = 0; gbc.gridy = 0;
         centerPanel.add(lb_className, gbc);
@@ -85,18 +86,17 @@ public class ReturnBook extends JPanel implements ActionListener {
         //bottom
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         bottomPanel.setOpaque(false);
-        bottomPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 80, 0)); // 距离底部留些空间
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 80, 0));
 
         btn_return = new JButton("归还");
         btn_return.setFont(new Font("宋体", Font.BOLD, 30));
         btn_return.setPreferredSize(new Dimension(200, 60));
-        btn_return.setBackground(new Color(255, 165, 0)); // 橙色按钮，显眼
+        btn_return.setBackground(new Color(255, 165, 0));
         btn_return.setForeground(Color.WHITE);
         btn_return.addActionListener(this);
 
         bottomPanel.add(btn_return);
         add(bottomPanel, BorderLayout.SOUTH);
-
     }
 
     @Override
@@ -104,31 +104,31 @@ public class ReturnBook extends JPanel implements ActionListener {
         if(e.getSource()==back){
             MainInterface.Return_to_User();
         } else if (e.getSource()==btn_return) {
-            String className = tf_className.getText().trim();
             String number = tf_number.getText().trim();
-            //自动获取当前日期
-            LocalDateTime now = LocalDateTime.now();
 
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-            String today = now.format(formatter);
-
-            System.out.println("当前系统日期(自动获取): " + today);
-
+            // 简单校验
+            if(number.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "请输入图书编号！", "提示", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
 
             try {
-
-
-                sqlConn.returnBook_BookUpdate(className, number, Basic_Information.user, today);
-                sqlConn.returnBook_UserUpdate(number, Basic_Information.user);
-
-                JOptionPane.showMessageDialog(null, "还书成功！");
-
-                // 清空并跳转
-                tf_className.setText("");
-                tf_number.setText("");
-                MainInterface.Return_to_User();
+                // 检查书是否真的是借出状态
+                String state = sqlConn.search_bookState(number);
+                if ("out".equals(state)) {
+                    sqlConn.returnBook_Update(number);
+                    JOptionPane.showMessageDialog(null, "还书成功！");
+                    tf_className.setText("");
+                    tf_number.setText("");
+                    MainInterface.Return_to_User();
+                } else if ("null".equals(state)) {
+                    JOptionPane.showMessageDialog(null, "书籍编号不存在！", "错误", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(null, "该书并未借出，无需归还。", "提示", JOptionPane.INFORMATION_MESSAGE);
+                }
             } catch (RuntimeException ex) {
-                throw new RuntimeException(ex);
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(null, "系统错误: " + ex.getMessage());
             }
         }
     }

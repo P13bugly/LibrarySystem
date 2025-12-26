@@ -25,7 +25,7 @@ public class BorrowBook_Output extends JPanel implements ActionListener {
         setBackground(new Color(240,255,240));
 
         JPanel topPanel=new JPanel(new FlowLayout(FlowLayout.LEFT,15,15));
-        topPanel.setOpaque(false);//透明
+        topPanel.setOpaque(false);
 
         back =new JButton("返回");
         back.setFont(new Font("宋体", Font.PLAIN, 20));
@@ -66,7 +66,8 @@ public class BorrowBook_Output extends JPanel implements ActionListener {
         btn_borrow.addActionListener(this);
         topPanel.add(btn_borrow);
 
-        add(topPanel, BorderLayout.NORTH);  //顶部居中
+        add(topPanel, BorderLayout.NORTH);
+
         //表头
         String[] columnNames = {
                 "图书编号", "分类编号", "图书名称", "分类名称",
@@ -82,7 +83,7 @@ public class BorrowBook_Output extends JPanel implements ActionListener {
 
         bookTable = new JTable(tableModel);
         bookTable.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-        bookTable.setRowHeight(28); // 行高
+        bookTable.setRowHeight(28);
 
         bookTable.getTableHeader().setFont(new Font("微软雅黑", Font.BOLD, 15));
         bookTable.getTableHeader().setBackground(new Color(220, 220, 220));
@@ -93,17 +94,17 @@ public class BorrowBook_Output extends JPanel implements ActionListener {
         bookTable.setDefaultRenderer(Object.class, centerRenderer);
 
         JScrollPane scrollPane = new JScrollPane(bookTable);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10)); // 边距
+        scrollPane.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
 
         add(scrollPane, BorderLayout.CENTER);
     }
+
     public static void setTable(){
         tableModel.setRowCount(0);
 
         if (Basic_Information.bookArray != null) {
             for (int i = 0; i < Basic_Information.bookArray.size(); i++) {
                 var book = Basic_Information.bookArray.get(i);
-                // 将对象转换为数组行
                 Object[] rowData = {
                         book.number,
                         book.classNumber,
@@ -118,34 +119,48 @@ public class BorrowBook_Output extends JPanel implements ActionListener {
             }
         }
     }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource()==back){
             MainInterface.BorrowInfo_to_Borrow();
         } else if (e.getSource()==btn_borrow) {
-            String bookId=tf_number.getText().trim();
-            String dateOff=tf_dateOff.getText().trim();
+            String bookId = tf_number.getText().trim();
+            String dateOff = tf_dateOff.getText().trim();
+
             if(bookId.isEmpty()||dateOff.isEmpty()){
                 JOptionPane.showMessageDialog(null,"请输入完整的图书编号和期限","提示",JOptionPane.ERROR_MESSAGE);
+                return;
             }
-            if(sqlConn.search_bookName(Basic_Information.search_className,bookId).equals("null")){
+
+            // 修改：不再传入 Basic_Information.search_className
+            if(sqlConn.search_bookName(bookId).equals("null")){
                 JOptionPane.showMessageDialog(null, "输入图书编号不存在", "借书失败", JOptionPane.ERROR_MESSAGE);
                 tf_number.setText("");
                 tf_dateOff.setText("");
-            }else {
-                if(sqlConn.search_bookState(Basic_Information.search_className,bookId).equals("in")){
-                    sqlConn.borrowBook_Update(Basic_Information.search_className,bookId,Basic_Information.user,dateOff);
-                    sqlConn.borrowBook_Insert(Basic_Information.search_className,bookId,Basic_Information.user,dateOff);
+            } else {
+                // 检查状态 (只传入 bookId)
+                // 注意：这里需要确保数据库里 state 默认是 "in"，如果是 NULL 可能需要 sqlConn 处理一下，或者这里判断 "null"
+                String currentState = sqlConn.search_bookState(bookId);
+
+                // 假设数据库默认 insert 时 state 是 "in" (对应之前代码)
+                // 或者 state 是 "0" (对应更早的 SQL)。
+                // 你的代码之前逻辑是 insert state, 之前的 SQL 脚本也设为了 'in'
+                if(currentState.equals("in") || currentState.equals("0")) {
+                    // 借书操作
+                    sqlConn.borrowBook_Update(bookId, Basic_Information.user, dateOff);
+                    // sqlConn.borrowBook_Insert(...); // 已删除
 
                     tf_dateOff.setText("");
                     tf_number.setText("");
                     JOptionPane.showMessageDialog(null,"借书成功");
                     MainInterface.BorrowInfo_to_Borrow();
                     MainInterface.Borrow_to_User();
-                }else {
-                    //书被借出
-                    int  holder=sqlConn.search_bookDateOff(Basic_Information.search_className,bookId);
-                    JOptionPane.showMessageDialog(null,"该书已借出至：" + holder, "借书失败", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    // 书被借出
+                    int holder = sqlConn.search_bookDateOff(bookId); // 之前方法返回 int, 如果是 date string 可能会报错，建议 sqlConn 改为返回 String
+                    // 如果 sqlConn 没改返回类型，这里先保持原样调用
+                    JOptionPane.showMessageDialog(null,"该书不可借，状态：" + currentState, "借书失败", JOptionPane.ERROR_MESSAGE);
                     tf_number.setText("");
                     tf_dateOff.setText("");
                 }

@@ -16,9 +16,6 @@ public class State_search extends JPanel implements ActionListener {
     private JLabel label_className;
     private JButton btn_search;
 
-    /**
-     * Create the panel.
-     */
     public State_search() {
         setBackground(new Color(250, 250, 210));
         setLayout(null);
@@ -35,15 +32,16 @@ public class State_search extends JPanel implements ActionListener {
         label.setBounds(530, 20, 294, 105);
         add(label);
 
-        label_className = new JLabel("书库类别名称：");
+        // 标签文字微调，提示用户可以不填
+        label_className = new JLabel("类别名称(空查所有)：");
         label_className.setFont(new Font("宋体", Font.BOLD, 35));
-        label_className.setBounds(241, 330, 283, 55);
+        label_className.setBounds(141, 330, 383, 55); // 调整坐标适应文字
         add(label_className);
 
         tf_className = new JTextField();
         tf_className.setFont(new Font("宋体", Font.BOLD, 35));
         tf_className.setColumns(10);
-        tf_className.setBounds(502, 320, 526, 75);
+        tf_className.setBounds(542, 320, 486, 75);
         add(tf_className);
 
         btn_search = new JButton("查询");
@@ -51,28 +49,32 @@ public class State_search extends JPanel implements ActionListener {
         btn_search.setBounds(558, 567, 251, 80);
         add(btn_search);
         btn_search.addActionListener(this);
-
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == back) {
             MainInterface.State_to_Manager();
-        }else if(e.getSource() == btn_search) {
+        } else if(e.getSource() == btn_search) {
 
-            String className = tf_className.getText();
+            String className = tf_className.getText().trim();
+            Basic_Information.search_className = className;
 
-            Basic_Information.search_className=className;
+            // 逻辑修改：不再检查 is_Table
+            // 直接调用查询，如果没有数据，Result List 会是空的
+            sqlConn.search_className(className);
 
-            //判定是否存在查询类别
-            if(sqlConn.is_Table(className+"book")) {
-                JOptionPane.showConfirmDialog(null, "欢迎", "查询成功", JOptionPane.OK_CANCEL_OPTION);
-                sqlConn.search_className(tf_className.getText());
+            if (!Basic_Information.bookArray.isEmpty()) {
+                JOptionPane.showConfirmDialog(null, "查询成功，共找到 " + Basic_Information.bookArray.size() + " 本书", "提示", JOptionPane.OK_CANCEL_OPTION);
                 MainInterface.State_to_StateInfo();
                 State_Output.setTextTable();
                 tf_className.setText("");
-            }else {
-                JOptionPane.showMessageDialog(null, "不存在该类别", "查询失败", JOptionPane.ERROR_MESSAGE);
+            } else {
+                // 如果没查到
+                JOptionPane.showMessageDialog(null, "未找到该类别的图书或书库为空", "查询无结果", JOptionPane.INFORMATION_MESSAGE);
+                // 也可以选择跳转过去显示空表
+                // MainInterface.State_to_StateInfo();
+                // State_Output.setTextTable();
             }
         }
     }

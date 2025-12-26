@@ -22,8 +22,8 @@ public class PersonalInfo extends JPanel implements ActionListener {
         setBackground(new Color(127, 255, 212));
 
         JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setOpaque(false); //透明
-        topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // 增加内边距
+        topPanel.setOpaque(false);
+        topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         back = new JButton("返回");
         back.setFont(new Font("宋体", Font.PLAIN, 20));
@@ -33,7 +33,7 @@ public class PersonalInfo extends JPanel implements ActionListener {
         JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         leftPanel.setOpaque(false);
         leftPanel.add(back);
-        leftPanel.setPreferredSize(new Dimension(150, 50)); // 预留左侧空间
+        leftPanel.setPreferredSize(new Dimension(150, 50));
 
         JLabel titleLabel = new JLabel("个人信息", JLabel.CENTER);
         titleLabel.setFont(new Font("宋体", Font.BOLD, 40));
@@ -49,13 +49,10 @@ public class PersonalInfo extends JPanel implements ActionListener {
 
         add(topPanel, BorderLayout.NORTH);
 
-
-        //表头
         String[] columnNames = {
                 "图书编号", "分类名称", "图书名称", "还书期限"
         };
 
-        //不可编辑
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -64,20 +61,19 @@ public class PersonalInfo extends JPanel implements ActionListener {
         };
 
         infoTable = new JTable(tableModel);
-        infoTable.setFont(new Font("微软雅黑", Font.PLAIN, 16)); // 内容字体略大
-        infoTable.setRowHeight(30); // 行高增加，不拥挤
+        infoTable.setFont(new Font("微软雅黑", Font.PLAIN, 16));
+        infoTable.setRowHeight(30);
 
         infoTable.getTableHeader().setFont(new Font("微软雅黑", Font.BOLD, 18));
-        infoTable.getTableHeader().setBackground(new Color(230, 230, 230)); // 浅灰表头
-        infoTable.getTableHeader().setReorderingAllowed(false); // 禁止拖动列
+        infoTable.getTableHeader().setBackground(new Color(230, 230, 230));
+        infoTable.getTableHeader().setReorderingAllowed(false);
 
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
         infoTable.setDefaultRenderer(Object.class, centerRenderer);
 
         JScrollPane scrollPane = new JScrollPane(infoTable);
-        scrollPane.getViewport().setBackground(Color.WHITE); // 表格背景白
-        // 设置滚动条面板的边距
+        scrollPane.getViewport().setBackground(Color.WHITE);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(0, 20, 20, 20));
 
         add(scrollPane, BorderLayout.CENTER);
@@ -85,20 +81,16 @@ public class PersonalInfo extends JPanel implements ActionListener {
         this.addAncestorListener(new javax.swing.event.AncestorListener() {
             @Override
             public void ancestorAdded(javax.swing.event.AncestorEvent event) {
-                // 当面板变得可见时，重新加载数据
                 System.out.println("面板可见，正在刷新数据... 当前用户: " + Basic_Information.user);
                 initData();
             }
-
             @Override
-            public void ancestorRemoved(javax.swing.event.AncestorEvent event) {
-            }
-
+            public void ancestorRemoved(javax.swing.event.AncestorEvent event) {}
             @Override
-            public void ancestorMoved(javax.swing.event.AncestorEvent event) {
-            }
+            public void ancestorMoved(javax.swing.event.AncestorEvent event) {}
         });
     }
+
     private void initData(){
         sqlConn.search_user(Basic_Information.user);
         tableModel.setRowCount(0);

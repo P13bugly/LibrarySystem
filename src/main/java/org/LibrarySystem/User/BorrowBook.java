@@ -32,15 +32,15 @@ public class BorrowBook extends JPanel implements ActionListener {
         label.setBounds(530, 62, 294, 105);
         add(label);
 
-        label_className = new JLabel("书库类别名称：");
+        label_className = new JLabel("书库类别名称(空查所有)：");
         label_className.setFont(new Font("宋体", Font.BOLD, 35));
-        label_className.setBounds(241, 330, 283, 55);
+        label_className.setBounds(141, 330, 383, 55);
         add(label_className);
 
         tf_className = new JTextField();
         tf_className.setFont(new Font("宋体", Font.BOLD, 35));
         tf_className.setColumns(10);
-        tf_className.setBounds(502, 320, 526, 75);
+        tf_className.setBounds(542, 320, 486, 75);
         add(tf_className);
 
         btn_search = new JButton("查询");
@@ -55,16 +55,18 @@ public class BorrowBook extends JPanel implements ActionListener {
         if(e.getSource()==back){
             MainInterface.Borrow_to_User();
         } else if (e.getSource()==btn_search) {
-            String className= tf_className.getText();
-            Basic_Information.search_className=className;
-            //search
-            if(sqlConn.is_Table(className)){
-                sqlConn.search_className(className);
+            String className = tf_className.getText().trim();
+            Basic_Information.search_className = className;
+
+            // Logic Change: 直接搜索，sqlConn 内部会处理空字符串的情况
+            sqlConn.search_className(className);
+
+            if (!Basic_Information.bookArray.isEmpty()) {
                 MainInterface.Borrow_to_BorrowInfo();
                 BorrowBook_Output.setTable();
                 tf_className.setText("");
-            }else {
-                JOptionPane.showMessageDialog(null, "不存在该类别", "查询失败", JOptionPane.ERROR_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "未找到该类别的图书", "查询结果为空", JOptionPane.INFORMATION_MESSAGE);
             }
         }
     }

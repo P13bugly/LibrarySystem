@@ -19,9 +19,6 @@ public class ProlongBook extends JPanel implements ActionListener {
     private JLabel lb_dateOff;
     private JButton btn_prolong;
 
-    /**
-     * Create the panel.
-     */
     public ProlongBook() {
         setBackground(new Color(250, 240, 230));
         setLayout(null);
@@ -38,15 +35,15 @@ public class ProlongBook extends JPanel implements ActionListener {
         label.setBounds(530, 20, 294, 105);
         add(label);
 
-        lb_className = new JLabel("书库类别名称：");
+        lb_className = new JLabel("书库类别名称(选填)：");
         lb_className.setFont(new Font("宋体", Font.BOLD, 35));
-        lb_className.setBounds(281, 216, 283, 55);
+        lb_className.setBounds(181, 216, 383, 55);
         add(lb_className);
 
         tf_className = new JTextField();
         tf_className.setFont(new Font("宋体", Font.BOLD, 35));
         tf_className.setColumns(10);
-        tf_className.setBounds(554, 206, 526, 75);
+        tf_className.setBounds(564, 206, 516, 75);
         add(tf_className);
 
         lb_number = new JLabel("书籍编号：");
@@ -62,13 +59,13 @@ public class ProlongBook extends JPanel implements ActionListener {
         tf_number = new JTextField();
         tf_number.setFont(new Font("宋体", Font.BOLD, 35));
         tf_number.setColumns(10);
-        tf_number.setBounds(554, 350, 526, 75);
+        tf_number.setBounds(564, 350, 516, 75);
         add(tf_number);
 
         tf_dateOff = new JTextField();
         tf_dateOff.setFont(new Font("宋体", Font.BOLD, 35));
         tf_dateOff.setColumns(10);
-        tf_dateOff.setBounds(554, 488, 526, 75);
+        tf_dateOff.setBounds(564, 488, 516, 75);
         add(tf_dateOff);
 
         btn_prolong = new JButton("续借");
@@ -83,15 +80,24 @@ public class ProlongBook extends JPanel implements ActionListener {
         if(e.getSource()==back){
             MainInterface.ProlongBook_to_User();
         } else if (e.getSource()==btn_prolong) {
-            String className=tf_className.getText().trim();
-            String number=tf_number.getText().trim();
-            String dateOff=tf_dateOff.getText().trim();
-            sqlConn.prolongBook_Update(className,number,dateOff, Basic_Information.user);
+            // String className = tf_className.getText().trim(); // 不再需要
+            String number = tf_number.getText().trim();
+            String dateOff = tf_dateOff.getText().trim();
 
+            // 简单校验
+            if(number.isEmpty() || dateOff.isEmpty()){
+                JOptionPane.showMessageDialog(null,"请填写编号和日期");
+                return;
+            }
+
+            // 调用新的 2 参数方法
+            sqlConn.prolongBook_Update(number, dateOff);
+
+            JOptionPane.showMessageDialog(null, "续借成功！");
             tf_className.setText("");
             tf_dateOff.setText("");
             tf_number.setText("");
-            MainInterface.Personal_to_User();
+            MainInterface.ProlongBook_to_User(); // 修正了原本跳转错误 (原代码是 Personal_to_User)
         }
     }
 }
