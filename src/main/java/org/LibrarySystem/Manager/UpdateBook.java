@@ -26,7 +26,6 @@ public class UpdateBook extends JPanel implements ActionListener {
     private JButton btn_submit, back;
 
     public UpdateBook() {
-        // ... (UI 布局代码保持不变，请复制原有的构造函数内容) ...
         setBackground(new Color(230, 230, 250));
         setLayout(null);
 
@@ -35,7 +34,7 @@ public class UpdateBook extends JPanel implements ActionListener {
         lb_old_number = new JLabel("旧编号："); lb_old_number.setFont(new Font("宋体", Font.BOLD, 35)); lb_old_number.setBounds(165, 127, 194, 55); add(lb_old_number);
         tf_old_number = new JTextField(); tf_old_number.setFont(new Font("宋体", Font.BOLD, 35)); tf_old_number.setBounds(298, 117, 252, 75); add(tf_old_number);
 
-        lb_old_className = new JLabel("旧分类(可选)："); // 提示用户
+        lb_old_className = new JLabel("旧分类："); // 提示用户
         lb_old_className.setFont(new Font("宋体", Font.BOLD, 35)); lb_old_className.setBounds(570, 127, 222, 55); add(lb_old_className);
         tf_old_className = new JTextField(); tf_old_className.setFont(new Font("宋体", Font.BOLD, 35)); tf_old_className.setBounds(788, 117, 342, 75); add(tf_old_className);
 
@@ -68,7 +67,6 @@ public class UpdateBook extends JPanel implements ActionListener {
         } else if(e.getSource() == btn_submit) {
             //旧信息
             String old_number = tf_old_number.getText();
-            // String old_className = tf_old_className.getText(); // 数据库重构后不需要它来定位了
 
             //新信息
             String number = tf_new_number.getText();
@@ -78,11 +76,8 @@ public class UpdateBook extends JPanel implements ActionListener {
             String price = tf_new_price.getText();
             String state = tf_new_state.getText();
 
-            // 逻辑修改：
-            // 1. 检查旧书是否存在 (只用 ID)
-            // 2. 如果存在，删除旧的，插入新的
+
             if(!sqlConn.search_bookState(old_number).equals("null")) {
-                // 删除旧书籍信息 (只需 ID)
                 sqlConn.deleteBook(old_number);
 
                 // 插入新书籍信息

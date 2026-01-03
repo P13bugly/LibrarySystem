@@ -80,7 +80,6 @@ public class ProlongBook extends JPanel implements ActionListener {
         if(e.getSource()==back){
             MainInterface.ProlongBook_to_User();
         } else if (e.getSource()==btn_prolong) {
-            // String className = tf_className.getText().trim(); // 不再需要
             String number = tf_number.getText().trim();
             String dateOff = tf_dateOff.getText().trim();
 
@@ -90,14 +89,13 @@ public class ProlongBook extends JPanel implements ActionListener {
                 return;
             }
 
-            // 调用新的 2 参数方法
             sqlConn.prolongBook_Update(number, dateOff);
 
             JOptionPane.showMessageDialog(null, "续借成功！");
             tf_className.setText("");
             tf_dateOff.setText("");
             tf_number.setText("");
-            MainInterface.ProlongBook_to_User(); // 修正了原本跳转错误 (原代码是 Personal_to_User)
+            MainInterface.ProlongBook_to_User();
         }
     }
 }

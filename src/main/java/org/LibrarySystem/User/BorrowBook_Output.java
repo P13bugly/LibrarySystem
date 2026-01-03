@@ -139,17 +139,12 @@ public class BorrowBook_Output extends JPanel implements ActionListener {
                 tf_number.setText("");
                 tf_dateOff.setText("");
             } else {
-                // 检查状态 (只传入 bookId)
-                // 注意：这里需要确保数据库里 state 默认是 "in"，如果是 NULL 可能需要 sqlConn 处理一下，或者这里判断 "null"
+                // 检查状态
                 String currentState = sqlConn.search_bookState(bookId);
 
-                // 假设数据库默认 insert 时 state 是 "in" (对应之前代码)
-                // 或者 state 是 "0" (对应更早的 SQL)。
-                // 你的代码之前逻辑是 insert state, 之前的 SQL 脚本也设为了 'in'
                 if(currentState.equals("in") || currentState.equals("0")) {
                     // 借书操作
                     sqlConn.borrowBook_Update(bookId, Basic_Information.user, dateOff);
-                    // sqlConn.borrowBook_Insert(...); // 已删除
 
                     tf_dateOff.setText("");
                     tf_number.setText("");
@@ -158,8 +153,7 @@ public class BorrowBook_Output extends JPanel implements ActionListener {
                     MainInterface.Borrow_to_User();
                 } else {
                     // 书被借出
-                    int holder = sqlConn.search_bookDateOff(bookId); // 之前方法返回 int, 如果是 date string 可能会报错，建议 sqlConn 改为返回 String
-                    // 如果 sqlConn 没改返回类型，这里先保持原样调用
+                    int holder = sqlConn.search_bookDateOff(bookId);
                     JOptionPane.showMessageDialog(null,"该书不可借，状态：" + currentState, "借书失败", JOptionPane.ERROR_MESSAGE);
                     tf_number.setText("");
                     tf_dateOff.setText("");

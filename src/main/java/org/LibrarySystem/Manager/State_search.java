@@ -60,8 +60,7 @@ public class State_search extends JPanel implements ActionListener {
             String className = tf_className.getText().trim();
             Basic_Information.search_className = className;
 
-            // 逻辑修改：不再检查 is_Table
-            // 直接调用查询，如果没有数据，Result List 会是空的
+
             sqlConn.search_className(className);
 
             if (!Basic_Information.bookArray.isEmpty()) {
@@ -70,11 +69,7 @@ public class State_search extends JPanel implements ActionListener {
                 State_Output.setTextTable();
                 tf_className.setText("");
             } else {
-                // 如果没查到
                 JOptionPane.showMessageDialog(null, "未找到该类别的图书或书库为空", "查询无结果", JOptionPane.INFORMATION_MESSAGE);
-                // 也可以选择跳转过去显示空表
-                // MainInterface.State_to_StateInfo();
-                // State_Output.setTextTable();
             }
         }
     }

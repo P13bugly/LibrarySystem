@@ -32,7 +32,7 @@ public class BorrowBook extends JPanel implements ActionListener {
         label.setBounds(530, 62, 294, 105);
         add(label);
 
-        label_className = new JLabel("书库类别名称(空查所有)：");
+        label_className = new JLabel("书库类别名称：");
         label_className.setFont(new Font("宋体", Font.BOLD, 35));
         label_className.setBounds(141, 330, 383, 55);
         add(label_className);
@@ -57,8 +57,6 @@ public class BorrowBook extends JPanel implements ActionListener {
         } else if (e.getSource()==btn_search) {
             String className = tf_className.getText().trim();
             Basic_Information.search_className = className;
-
-            // Logic Change: 直接搜索，sqlConn 内部会处理空字符串的情况
             sqlConn.search_className(className);
 
             if (!Basic_Information.bookArray.isEmpty()) {

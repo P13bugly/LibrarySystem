@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class InsertBook extends JPanel implements ActionListener {
-    // ... (UI组件定义保持不变) ...
     private JTextField tf_number;
     private JTextField tf_classNumber;
     private JTextField tf_name;
@@ -21,7 +20,6 @@ public class InsertBook extends JPanel implements ActionListener {
     private JButton back, btn_submit;
 
     public InsertBook(){
-        // ... (UI布局代码保持不变，请直接复制之前的布局代码) ...
         setBackground(Color.PINK);
         setLayout(null);
 
@@ -31,10 +29,7 @@ public class InsertBook extends JPanel implements ActionListener {
         label.setBounds(530, 0, 294, 105);
         add(label);
 
-        // ... (中间的 add 组件代码省略，和原来一样) ...
-        // 为了节省篇幅，这里假设中间的 add 代码与原文件一致
 
-        // 简写重新定义组件以防万一
         lb_number = new JLabel("编号："); lb_number.setFont(new Font("宋体", Font.BOLD, 35)); lb_number.setBounds(293, 137, 194, 55); add(lb_number);
         tf_number = new JTextField(); tf_number.setFont(new Font("宋体", Font.BOLD, 35)); tf_number.setBounds(486, 127, 526, 75); add(tf_number);
 
@@ -83,7 +78,6 @@ public class InsertBook extends JPanel implements ActionListener {
             String state = tf_state.getText();
             String total = tf_total.getText();
 
-            // 逻辑修改：不需要传入 className 去查状态，只需要查 ID 是否存在
             if (sqlConn.search_bookState(number).equals("null")) {
                 // 插入书籍信息
                 sqlConn.insertBook(number, classNumber, name, className, price, state, total);

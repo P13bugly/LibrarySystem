@@ -24,11 +24,9 @@ public class sqlConn {
 
     // 构造函数测试连接（保留原逻辑）
     public sqlConn() {
-        // 注意：原代码查的是 temp 表，确保你的库里有 temp 表，否则这里会报错
-        // 建议仅用于测试，或者直接注释掉
+
     }
 
-    // --- 认证相关方法 (保持不变，因为 User/Manager 表结构没变) ---
 
     private static boolean checkUserExist(String table, String userCol, String pwdCol, String user, String password) {
         String sql = "SELECT count(*) FROM " + table + " WHERE " + userCol + " = ? AND " + pwdCol + " = ?";
@@ -109,11 +107,10 @@ public class sqlConn {
         return checkUserNameExist("Manager", "manager_user", user);
     }
 
-    // --- 图书管理核心逻辑 (重构重点) ---
+    /* --- 图书管理核心逻辑  --- */
 
     // 插入新书 (统一插入到 Book 表)
     public static void insertBook(String number, String classnumber, String name, String classname, String price, String state, String total) {
-        // SQL 统一为 Book 表
         String sql = "INSERT INTO Book (number, classnumber, name, classname, price, state, total, current, dateon, dateoff) VALUES(?, ?, ?, ?, ?, ?, ?, NULL, NULL, NULL)";
 
         try (Connection conn = getConnection();
@@ -132,8 +129,6 @@ public class sqlConn {
         }
     }
 
-    // [已弃用] 新建图书类别 - 现在的设计不需要动态建表
-    // public static void newClass(...) { ... }
 
     // 删除图书信息
     public static void deleteBook(String number) {
@@ -148,7 +143,7 @@ public class sqlConn {
         }
     }
 
-    // 查询图书 (根据 classname 过滤，或者查询全部)
+    // 查询图书
     public static void search_className(String classname) {
         Basic_Information.bookArray.clear();
         String sql;
@@ -188,10 +183,8 @@ public class sqlConn {
         }
     }
 
-    // --- 借还书逻辑 (重构：只操作 Book 表) ---
+    // --- 借还书逻辑
 
-    // 借书：更新 Book 表状态
-    // 原参数 classname 这里不再作为表名，但可能作为校验，这里简化处理只用 number
     public static void borrowBook_Update(String number, String user, String dateoff) {
         String sql = "UPDATE Book SET state = 'out', current = ?, dateoff = ? WHERE number = ?";
 
@@ -206,8 +199,7 @@ public class sqlConn {
         }
     }
 
-    // [已弃用] 借书记录插入 (旧逻辑) -> 现在合并进了 borrowBook_Update
-    // public static void borrowBook_Insert(...) { ... }
+
 
     // 还书：更新 Book 表状态 (清空借阅人信息)
     public static void returnBook_Update(String number) {
@@ -221,8 +213,7 @@ public class sqlConn {
         }
     }
 
-    // [已弃用] 还书删除记录 (旧逻辑)
-    // public static void returnBook_UserUpdate(...) { ... }
+
 
     // 续借：只更新 Book 表的 dateoff
     public static void prolongBook_Update(String number, String dateoff) {
@@ -262,8 +253,6 @@ public class sqlConn {
         }
     }
 
-    // [已弃用] 是否存在Table (现在只有一张表 Book，不再需要检测)
-    // public static boolean is_Table(String table) { ... }
 
     // 辅助：获取单个值
     private static String getSingleValue(String number, String columnLabel) {

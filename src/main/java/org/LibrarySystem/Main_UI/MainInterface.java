@@ -190,11 +190,6 @@ public class MainInterface extends JFrame implements ActionListener {
         managerJPanel.setVisible(true);
     }
 
-    /*
-     * [已删除] Manager <-> NewClass 的切换逻辑
-     * public static void Manager_to_NewClass() { ... }
-     * public static void NewClass_to_Manager() { ... }
-     */
 
     // Manager --> UpdateBook
     public static void Manager_to_Update() {
